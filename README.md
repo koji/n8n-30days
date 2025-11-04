@@ -32,4 +32,4 @@ Created a basic workflow to check Gmail messages.
 
 ### Workflow JSON
 
-See [SimpleGmailCheeck.json](./day2/SimpleGmailCheeck.json) for the workflow configuration.
+See [SimpleGmailCheck.json](./day2/SimpleGmailCheck.json) for the workflow configuration.
