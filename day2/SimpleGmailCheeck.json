@@ -1,0 +1,126 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "filters": {}
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        0
+      ],
+      "id": "e21d52e5-e52e-4758-8fb8-49a23196dd14",
+      "name": "Gmail Trigger",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "AEOmwMPJs14uEFs6",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Summarize messages within 100 words if the message is written in English.\n日本語の場合は100文字でまとめて下さい。\n\n{{ $json.snippet }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        208,
+        0
+      ],
+      "id": "9e95fb18-1a81-4cd6-8198-7b5413dc9f8a",
+      "name": "Message a model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "CPTRn5I3M0jF7Yvi",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "=#general",
+          "mode": "name"
+        },
+        "text": "=from n8n  \n{{ $json.content.parts[0].text }}",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        560,
+        0
+      ],
+      "id": "378786bf-1814-4639-9f22-169a9e979b78",
+      "name": "Send a message",
+      "webhookId": "ddd14207-4f5c-4e5b-b439-084c08134e09",
+      "credentials": {
+        "slackApi": {
+          "id": "ywCESkexPc5wxuJb",
+          "name": "Slack account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "6eb7acb5-b745-4ad0-8210-e12174c838ac",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "e73fbfe4c69451a54f9cdd5608e8f0267767457d391052a044578d270715ba18"
+  },
+  "id": "9FlSQ8SZrShpthm3",
+  "tags": []
+}
