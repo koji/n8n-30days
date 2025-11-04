@@ -17,3 +17,19 @@ docker compose up -d
 http://localhost:5678/setup
 
 ![day1-setup](./images/day1.png)
+
+## Day 2 Simple Gmail Check
+
+Created a basic workflow to check Gmail messages.
+
+### Workflow
+
+![day2-workflow](./day2/workflow.png)
+
+### Result
+
+![day2-result](./day2/result.png)
+
+### Workflow JSON
+
+See [SimpleGmailCheck.json](./day2/SimpleGmailCheck.json) for the workflow configuration.
