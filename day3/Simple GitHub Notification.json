@@ -1,0 +1,97 @@
+{
+  "name": "Simple GitHub Notification",
+  "nodes": [
+    {
+      "parameters": {
+        "owner": {
+          "__rl": true,
+          "value": "koji",
+          "mode": "name"
+        },
+        "repository": {
+          "__rl": true,
+          "value": "https://github.com/koji/hyouji",
+          "mode": "url"
+        },
+        "events": [
+          "issues"
+        ],
+        "options": {}
+      },
+      "type": "n8n-nodes-base.githubTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "b559bd27-d336-4f71-8e5d-c52230516c1c",
+      "name": "Github Trigger",
+      "webhookId": "3ed57d62-abba-42d0-b4e1-be8192a1a600",
+      "credentials": {
+        "githubApi": {
+          "id": "rE7GPqFxwZqsgswS",
+          "name": "GitHub account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "#github",
+          "mode": "name"
+        },
+        "text": "=from n8n workflow \na new issue is created\n{{ $json.body.issue.title }}\n{{ $json.body.issue.body }}\n{{ $json.body.issue.repository_url }}",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        208,
+        0
+      ],
+      "id": "d3ce61bb-34a2-4891-9e91-fa93f4911685",
+      "name": "Send a message",
+      "webhookId": "4bbba888-b92f-4289-8d7f-414ee7df593c",
+      "credentials": {
+        "slackApi": {
+          "id": "ywCESkexPc5wxuJb",
+          "name": "Slack account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Github Trigger": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "a5c72389-2864-475e-86dc-2a96d03974f3",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "e73fbfe4c69451a54f9cdd5608e8f0267767457d391052a044578d270715ba18"
+  },
+  "id": "C8VXLhYspSYFpOR3",
+  "tags": [
+    {
+      "name": "github",
+      "id": "NBJwaFwVP5bAzAME",
+      "updatedAt": "2025-11-05T06:24:08.687Z",
+      "createdAt": "2025-11-05T06:24:08.687Z"
+    }
+  ]
+}

@@ -33,3 +33,24 @@ Created a basic workflow to check Gmail messages.
 ### Workflow JSON
 
 See [SimpleGmailCheck.json](./day2/SimpleGmailCheck.json) for the workflow configuration.
+
+## Day 3 GitHub to Slack Notification
+
+Created a workflow that sends a Slack notification when a new GitHub issue is created.
+
+requirements for localhost
+
+- ngrok (for webhook) the following video is useful
+  https://www.youtube.com/watch?v=Sa6c67czyMw
+
+### Workflow Setup
+
+![day3-workflow](./day3/n8n-workflow.png)
+
+### Slack Notification Result
+
+![day3-result](./day3/slack.png)
+
+### Workflow JSON
+
+See [Simple GitHub Notification.json](./day3/Simple%20GitHub%20Notification.json) for the workflow configuration.
