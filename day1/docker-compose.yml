@@ -7,6 +7,10 @@ services:
     environment:
       - TZ=${TZ:-America/New_York}
       - N8N_ENCRYPTION_KEY=${N8N_ENCRYPTION_KEY}
+      - WEBHOOK_URL=${WEBHOOK_URL:-http://localhost:5678/}
+      - N8N_HOST=${N8N_HOST:-localhost}
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=${N8N_PROTOCOL:-http}
     volumes:
       - n8n-data:/home/node/.n8n
 
