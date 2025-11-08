@@ -1,0 +1,577 @@
+{
+  "name": "Simple Weather Report",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 9
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "f38b9675-3871-49a4-b146-add81a2aadcb",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "url": "https://api.open-meteo.com/v1/forecast?latitude=40.6501&longitude=-73.9496&daily=temperature_2m_max,temperature_2m_min&hourly=temperature_2m&current=temperature_2m,relative_humidity_2m",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        272,
+        16
+      ],
+      "id": "00eb2eed-0ff0-4bb0-ae2e-034b77ecf0bb",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        192
+      ],
+      "id": "394b1f85-e765-486d-b03a-5a8cd7cfec3c",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "jsCode": "// weatherMessage.js\n\n\n  const obj = items[0].json\n  const daily = obj.daily;\n  const dates = daily.time;\n  const maxTemps = daily.temperature_2m_max;\n  const minTemps = daily.temperature_2m_min;\n\n  // Build today's date string in YYYY-MM-DD (local time)\n  const now = new Date();\n  const yyyy = now.getFullYear();\n  const mm = String(now.getMonth() + 1).padStart(2, '0');\n  const dd = String(now.getDate()).padStart(2, '0');\n  const todayStr = `${yyyy}-${mm}-${dd}`;\n\n  // Find today's index; fallback to the first day if not found\n  const idx = dates.indexOf(todayStr);\n  const max = idx !== -1 ? maxTemps[idx] : maxTemps[0];\n  const min = idx !== -1 ? minTemps[idx] : minTemps[0];\n\n  const message = `Today’s high in Brooklyn: ${max}, and the low: ${min}.`\n\nreturn [{json: {message}}]\n\n  \n\n\n\n// Example usage:\n// const message = getTodaysBrooklynTempsMessage(YOUR_JSON_DATA);\n// console.log(message);\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        480,
+        16
+      ],
+      "id": "e832eb1b-c3c4-4a02-9dbf-c328d01201db",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "#weather",
+          "mode": "name"
+        },
+        "text": "=Weather report\n{{ $json.message }}",
+        "otherOptions": {
+          "includeLinkToWorkflow": false
+        }
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        688,
+        16
+      ],
+      "id": "2cb8b71e-3008-4f82-b883-eabb087478e9",
+      "name": "Send a message",
+      "webhookId": "a1e0efcb-f3eb-4166-b82a-c3d1b5cde81b",
+      "credentials": {
+        "slackApi": {
+          "id": "ywCESkexPc5wxuJb",
+          "name": "Slack account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Sending Weather report to a Slack channel \n\n[requirement]\nhttps://open-meteo.com's endpoint\n",
+        "height": 576,
+        "width": 992
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -64,
+        -208
+      ],
+      "id": "995fee3b-dc24-4ced-afbd-b0b0b4f8e9c8",
+      "name": "Sticky Note"
+    }
+  ],
+  "pinData": {
+    "HTTP Request": [
+      {
+        "json": {
+          "latitude": 40.64453,
+          "longitude": -73.94229,
+          "generationtime_ms": 0.08022785186767578,
+          "utc_offset_seconds": 0,
+          "timezone": "GMT",
+          "timezone_abbreviation": "GMT",
+          "elevation": 19,
+          "current_units": {
+            "time": "iso8601",
+            "interval": "seconds",
+            "temperature_2m": "°C",
+            "relative_humidity_2m": "%"
+          },
+          "current": {
+            "time": "2025-11-08T22:30",
+            "interval": 900,
+            "temperature_2m": 14.7,
+            "relative_humidity_2m": 45
+          },
+          "hourly_units": {
+            "time": "iso8601",
+            "temperature_2m": "°C"
+          },
+          "hourly": {
+            "time": [
+              "2025-11-08T00:00",
+              "2025-11-08T01:00",
+              "2025-11-08T02:00",
+              "2025-11-08T03:00",
+              "2025-11-08T04:00",
+              "2025-11-08T05:00",
+              "2025-11-08T06:00",
+              "2025-11-08T07:00",
+              "2025-11-08T08:00",
+              "2025-11-08T09:00",
+              "2025-11-08T10:00",
+              "2025-11-08T11:00",
+              "2025-11-08T12:00",
+              "2025-11-08T13:00",
+              "2025-11-08T14:00",
+              "2025-11-08T15:00",
+              "2025-11-08T16:00",
+              "2025-11-08T17:00",
+              "2025-11-08T18:00",
+              "2025-11-08T19:00",
+              "2025-11-08T20:00",
+              "2025-11-08T21:00",
+              "2025-11-08T22:00",
+              "2025-11-08T23:00",
+              "2025-11-09T00:00",
+              "2025-11-09T01:00",
+              "2025-11-09T02:00",
+              "2025-11-09T03:00",
+              "2025-11-09T04:00",
+              "2025-11-09T05:00",
+              "2025-11-09T06:00",
+              "2025-11-09T07:00",
+              "2025-11-09T08:00",
+              "2025-11-09T09:00",
+              "2025-11-09T10:00",
+              "2025-11-09T11:00",
+              "2025-11-09T12:00",
+              "2025-11-09T13:00",
+              "2025-11-09T14:00",
+              "2025-11-09T15:00",
+              "2025-11-09T16:00",
+              "2025-11-09T17:00",
+              "2025-11-09T18:00",
+              "2025-11-09T19:00",
+              "2025-11-09T20:00",
+              "2025-11-09T21:00",
+              "2025-11-09T22:00",
+              "2025-11-09T23:00",
+              "2025-11-10T00:00",
+              "2025-11-10T01:00",
+              "2025-11-10T02:00",
+              "2025-11-10T03:00",
+              "2025-11-10T04:00",
+              "2025-11-10T05:00",
+              "2025-11-10T06:00",
+              "2025-11-10T07:00",
+              "2025-11-10T08:00",
+              "2025-11-10T09:00",
+              "2025-11-10T10:00",
+              "2025-11-10T11:00",
+              "2025-11-10T12:00",
+              "2025-11-10T13:00",
+              "2025-11-10T14:00",
+              "2025-11-10T15:00",
+              "2025-11-10T16:00",
+              "2025-11-10T17:00",
+              "2025-11-10T18:00",
+              "2025-11-10T19:00",
+              "2025-11-10T20:00",
+              "2025-11-10T21:00",
+              "2025-11-10T22:00",
+              "2025-11-10T23:00",
+              "2025-11-11T00:00",
+              "2025-11-11T01:00",
+              "2025-11-11T02:00",
+              "2025-11-11T03:00",
+              "2025-11-11T04:00",
+              "2025-11-11T05:00",
+              "2025-11-11T06:00",
+              "2025-11-11T07:00",
+              "2025-11-11T08:00",
+              "2025-11-11T09:00",
+              "2025-11-11T10:00",
+              "2025-11-11T11:00",
+              "2025-11-11T12:00",
+              "2025-11-11T13:00",
+              "2025-11-11T14:00",
+              "2025-11-11T15:00",
+              "2025-11-11T16:00",
+              "2025-11-11T17:00",
+              "2025-11-11T18:00",
+              "2025-11-11T19:00",
+              "2025-11-11T20:00",
+              "2025-11-11T21:00",
+              "2025-11-11T22:00",
+              "2025-11-11T23:00",
+              "2025-11-12T00:00",
+              "2025-11-12T01:00",
+              "2025-11-12T02:00",
+              "2025-11-12T03:00",
+              "2025-11-12T04:00",
+              "2025-11-12T05:00",
+              "2025-11-12T06:00",
+              "2025-11-12T07:00",
+              "2025-11-12T08:00",
+              "2025-11-12T09:00",
+              "2025-11-12T10:00",
+              "2025-11-12T11:00",
+              "2025-11-12T12:00",
+              "2025-11-12T13:00",
+              "2025-11-12T14:00",
+              "2025-11-12T15:00",
+              "2025-11-12T16:00",
+              "2025-11-12T17:00",
+              "2025-11-12T18:00",
+              "2025-11-12T19:00",
+              "2025-11-12T20:00",
+              "2025-11-12T21:00",
+              "2025-11-12T22:00",
+              "2025-11-12T23:00",
+              "2025-11-13T00:00",
+              "2025-11-13T01:00",
+              "2025-11-13T02:00",
+              "2025-11-13T03:00",
+              "2025-11-13T04:00",
+              "2025-11-13T05:00",
+              "2025-11-13T06:00",
+              "2025-11-13T07:00",
+              "2025-11-13T08:00",
+              "2025-11-13T09:00",
+              "2025-11-13T10:00",
+              "2025-11-13T11:00",
+              "2025-11-13T12:00",
+              "2025-11-13T13:00",
+              "2025-11-13T14:00",
+              "2025-11-13T15:00",
+              "2025-11-13T16:00",
+              "2025-11-13T17:00",
+              "2025-11-13T18:00",
+              "2025-11-13T19:00",
+              "2025-11-13T20:00",
+              "2025-11-13T21:00",
+              "2025-11-13T22:00",
+              "2025-11-13T23:00",
+              "2025-11-14T00:00",
+              "2025-11-14T01:00",
+              "2025-11-14T02:00",
+              "2025-11-14T03:00",
+              "2025-11-14T04:00",
+              "2025-11-14T05:00",
+              "2025-11-14T06:00",
+              "2025-11-14T07:00",
+              "2025-11-14T08:00",
+              "2025-11-14T09:00",
+              "2025-11-14T10:00",
+              "2025-11-14T11:00",
+              "2025-11-14T12:00",
+              "2025-11-14T13:00",
+              "2025-11-14T14:00",
+              "2025-11-14T15:00",
+              "2025-11-14T16:00",
+              "2025-11-14T17:00",
+              "2025-11-14T18:00",
+              "2025-11-14T19:00",
+              "2025-11-14T20:00",
+              "2025-11-14T21:00",
+              "2025-11-14T22:00",
+              "2025-11-14T23:00"
+            ],
+            "temperature_2m": [
+              13.8,
+              13.2,
+              12.7,
+              12.7,
+              12.9,
+              12.9,
+              12.8,
+              13.1,
+              13.1,
+              13,
+              12.7,
+              12.7,
+              13.1,
+              12.7,
+              14,
+              15.8,
+              17.4,
+              18.6,
+              18.8,
+              19.7,
+              19.6,
+              18.4,
+              15.5,
+              14.1,
+              13,
+              12.3,
+              12.5,
+              12.3,
+              11.6,
+              11.3,
+              10.3,
+              10.8,
+              10.8,
+              10.8,
+              10.3,
+              9.8,
+              9.9,
+              11.8,
+              15.8,
+              16.6,
+              16.3,
+              16.6,
+              16.5,
+              15.4,
+              15.8,
+              15,
+              14.1,
+              13.9,
+              13.9,
+              14.5,
+              14.8,
+              14.5,
+              14.2,
+              13.2,
+              12.4,
+              12.7,
+              12.5,
+              12.5,
+              11.8,
+              11.4,
+              11.1,
+              9.2,
+              9,
+              9.9,
+              10.6,
+              11.6,
+              11.8,
+              12.5,
+              12.3,
+              11.8,
+              11,
+              9.1,
+              8.3,
+              7.4,
+              6.2,
+              5.2,
+              4.5,
+              3.9,
+              3.4,
+              2.9,
+              2.6,
+              2.2,
+              1.9,
+              1.5,
+              1.2,
+              1.3,
+              1.8,
+              2.5,
+              3,
+              3.9,
+              5.2,
+              5.8,
+              5.8,
+              5.6,
+              5.7,
+              5.7,
+              5.7,
+              5.4,
+              5.3,
+              4.9,
+              4.4,
+              4.1,
+              3.7,
+              3.8,
+              3.9,
+              4,
+              4.7,
+              4.8,
+              5,
+              5.4,
+              6.3,
+              7.2,
+              8.2,
+              9.3,
+              9.5,
+              9.8,
+              9.7,
+              9.7,
+              9.9,
+              10.2,
+              10.1,
+              9.8,
+              9.8,
+              9.9,
+              9.5,
+              9.3,
+              8.8,
+              8.6,
+              8.6,
+              8.4,
+              7.7,
+              7.7,
+              7.4,
+              7.8,
+              8.5,
+              9,
+              9.3,
+              9.5,
+              9.6,
+              9.7,
+              9.6,
+              9.4,
+              9.1,
+              8.7,
+              8.2,
+              7.9,
+              7.5,
+              7.1,
+              6.7,
+              6.3,
+              5.9,
+              5.6,
+              5.3,
+              5.1,
+              4.8,
+              4.5,
+              4.5,
+              4.9,
+              5.6,
+              6.2,
+              6.7,
+              7.2,
+              7.5,
+              7.5,
+              7.3,
+              7,
+              6.4,
+              5.6
+            ]
+          },
+          "daily_units": {
+            "time": "iso8601",
+            "temperature_2m_max": "°C",
+            "temperature_2m_min": "°C"
+          },
+          "daily": {
+            "time": [
+              "2025-11-08",
+              "2025-11-09",
+              "2025-11-10",
+              "2025-11-11",
+              "2025-11-12",
+              "2025-11-13",
+              "2025-11-14"
+            ],
+            "temperature_2m_max": [
+              19.7,
+              16.6,
+              14.8,
+              8.3,
+              10.2,
+              10.1,
+              8.2
+            ],
+            "temperature_2m_min": [
+              12.7,
+              9.8,
+              9,
+              1.2,
+              3.7,
+              7.4,
+              4.5
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "c21cb50d-786e-40d9-808c-d67db379c81c",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "e73fbfe4c69451a54f9cdd5608e8f0267767457d391052a044578d270715ba18"
+  },
+  "id": "er2dM8uHBWMQ6Gg1",
+  "tags": [
+    {
+      "name": "slack",
+      "id": "oendmiMm2sJvv75n",
+      "updatedAt": "2025-11-08T23:00:57.917Z",
+      "createdAt": "2025-11-08T23:00:57.917Z"
+    }
+  ]
+}
