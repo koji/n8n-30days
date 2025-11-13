@@ -1,0 +1,152 @@
+{
+  "name": "Pokemon_API_Workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -288,
+        -192
+      ],
+      "id": "986feead-faf2-4485-8463-d45447bd9522",
+      "name": "When chat message received",
+      "webhookId": "5f577530-51eb-4884-b669-e53960189928"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "**You are a Pokémon encyclopedia assistant.**  \nWhen a user makes a request like “Tell me about 〇〇,” please call the tool `pokemon_info` as needed.\n\n- If the name is given in Japanese, convert it to the English name before calling the tool (e.g., ピカチュウ → pikachu).\n- From the JSON retrieved by the tool, summarize and respond in Japanese using the following information:\n  - Pokédex number (`id`)\n  - English name (`name`) and color (`color.name`)\n  - Whether it is a legendary Pokémon (`is_legendary`) or mythical (`is_mythical`)\n  - The most recent flavor text from `flavor_text_entries` where the language is either `\"ja-Hrkt\"` or `\"en\"` (only one entry)\n\n**The output should be English**"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        -80,
+        -192
+      ],
+      "id": "fad005eb-92e6-4545-b5f8-24ad9792d34a",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -224,
+        16
+      ],
+      "id": "cc6cf2f3-dd8d-4f43-b617-0412832ec29e",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "2JsLbjy4MbUoXgxk",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toolDescription": "=Detect a pokemon name from \nRetrieve Pokémon species information from the PokeAPI. Input JSON: {\"name\": \"<English name of the Pokémon>\"} If the user inputs the Pokémon name in Japanese, translate it to the English name before calling the API. Return the retrieved JSON response as-is.\n",
+        "url": "=https://pokeapi.co/api/v2/pokemon-species/{{ $fromAI(\"name\") }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.3,
+      "position": [
+        160,
+        32
+      ],
+      "id": "95810382-bc55-4b7f-831f-ef443225b674",
+      "name": "pokemon_info"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -80,
+        16
+      ],
+      "id": "41dc19d4-fe24-4512-a5f7-4dfbb626b73d",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "content": "## Pokemon API\nrequirements\n- google gemini api key\n- https://pokeapi.co/",
+        "height": 544,
+        "width": 816
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -400,
+        -336
+      ],
+      "id": "e5923ff4-fef5-4088-a9a9-340fb7cf4f76",
+      "name": "Sticky Note"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "pokemon_info": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "5115c1ff-9326-4b2b-8a65-a3ef429c4a0b",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "747c48163b3755ac2f7439e6b96dd8ca2ddac4d09198d1423b696b37d0c84131"
+  },
+  "id": "uOT603HLoeoxiEmk",
+  "tags": []
+}

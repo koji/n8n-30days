@@ -135,6 +135,7 @@ Deployed n8n to Hugging Face Spaces with Supabase as the database backend for pe
 ### Access
 
 Once deployed, access your n8n instance at:
+
 ```
 https://huggingface.co/spaces/<your-username>/<your-space>
 ```
@@ -143,3 +144,41 @@ https://huggingface.co/spaces/<your-username>/<your-space>
 
 - [Dockerfile](./day6/Dockerfile) - Container configuration
 - [SETUP.md](./day6/SETUP.md) - Detailed setup instructions
+
+## Day 7 Pokémon API Integration with Google Gemini
+
+Created an AI-powered Pokémon information assistant that fetches data from PokeAPI and responds to natural language queries.
+
+### Features
+
+- Chat interface for natural language queries about Pokémon
+- Google Gemini integration for understanding user requests
+- Automatic Japanese to English translation for Pokémon names
+- Fetches detailed Pokémon information from PokeAPI
+- Formatted responses with key Pokémon details
+- Conversation memory for context-aware interactions
+
+### Workflow
+
+![day7-workflow](./day7/workflow.png)
+
+### Example Interaction
+
+1. User asks about a Pokémon (e.g., "Tell me about Pikachu" or "ピカチュウについて教えて")
+2. The AI processes the request and fetches data from PokeAPI
+3. System responds with:
+   - Pokédex number
+   - English name and color
+   - Legendary/Mythical status
+   - Flavor text in Japanese or English
+
+![demo](./day7/workflow.mp4)
+
+### Requirements
+
+- Google Gemini API key
+- Access to PokeAPI (https://pokeapi.co/)
+
+### Workflow JSON
+
+See [Pokemon_API_Workflow.json](./day7/Pokemon_API_Workflow.json) for the workflow configuration.
