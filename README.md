@@ -172,7 +172,11 @@ Created an AI-powered Pokémon information assistant that fetches data from Poke
    - Legendary/Mythical status
    - Flavor text in Japanese or English
 
-![demo](./day7/workflow.mp4)
+
+
+https://github.com/user-attachments/assets/8e32505e-96f4-4dd9-968f-5c8e2bfe4996
+
+
 
 ### Requirements
 
