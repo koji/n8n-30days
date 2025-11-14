@@ -172,11 +172,7 @@ Created an AI-powered Pokémon information assistant that fetches data from Poke
    - Legendary/Mythical status
    - Flavor text in Japanese or English
 
-
-
 https://github.com/user-attachments/assets/8e32505e-96f4-4dd9-968f-5c8e2bfe4996
-
-
 
 ### Requirements
 
@@ -186,3 +182,27 @@ https://github.com/user-attachments/assets/8e32505e-96f4-4dd9-968f-5c8e2bfe4996
 ### Workflow JSON
 
 See [Pokemon_API_Workflow.json](./day7/Pokemon_API_Workflow.json) for the workflow configuration.
+
+## Day 8 RSS Feed Classifier
+
+Created an automated workflow that classifies RSS feed items and routes them to appropriate Slack channels based on content.
+
+### Features
+
+- Monitors Zenn.dev RSS feed for new articles
+- Uses Google Gemini to classify articles into categories (AI, React, TypeScript)
+- Routes articles to dedicated Slack channels based on classification
+- Runs automatically on a schedule (every minute)
+- Supports Japanese content from Zenn.dev
+
+### Workflow
+
+![day8-workflow](./day8/workflow.png)
+
+### Slack Notification
+
+![day8-slack](./day8/slack.png)
+
+### Workflow JSON
+
+See [RSS feed classifier.json](./day8/RSS%20feed%20classifier.json) for the workflow configuration.

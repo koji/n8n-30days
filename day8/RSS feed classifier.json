@@ -1,0 +1,244 @@
+{
+  "name": "RSS feed classifier",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "feedUrl": "https://zenn.dev/feed"
+      },
+      "type": "n8n-nodes-base.rssFeedReadTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "6e5cfc61-320d-4818-8699-55b12f51d766",
+      "name": "RSS Feed Trigger"
+    },
+    {
+      "parameters": {
+        "inputText": "=Title: {{ $json.title }}\nContent: {{ $json.content }}\n\n",
+        "categories": {
+          "categories": [
+            {
+              "category": "AI",
+              "description": "AI, LLM article"
+            },
+            {
+              "category": "React",
+              "description": "React.js article"
+            },
+            {
+              "category": "Typescript",
+              "description": "TypeScript article"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.textClassifier",
+      "typeVersion": 1.1,
+      "position": [
+        208,
+        0
+      ],
+      "id": "3482a90d-9813-47e9-a9b7-ab77e239508f",
+      "name": "Text Classifier"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        144,
+        208
+      ],
+      "id": "400762d8-e995-4859-b8fa-2d20b7dabb9d",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "2JsLbjy4MbUoXgxk",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "#ai",
+          "mode": "name"
+        },
+        "text": "={{ $('RSS Feed Trigger').item.json.link }}",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        656,
+        -176
+      ],
+      "id": "28ca48d9-a431-4cb1-8a6b-ef86216cbaaf",
+      "name": "Send a message",
+      "webhookId": "0ec8e317-c86a-411b-8f6b-a8196dcdbfa9",
+      "credentials": {
+        "slackApi": {
+          "id": "WS2EnAghw3bXuNlB",
+          "name": "Slack account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "#react",
+          "mode": "name"
+        },
+        "text": "={{ $('RSS Feed Trigger').item.json.link }}",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        656,
+        16
+      ],
+      "id": "5ad352bb-b504-4087-afa0-81e393b3c6b1",
+      "name": "Send a message1",
+      "webhookId": "0ec8e317-c86a-411b-8f6b-a8196dcdbfa9",
+      "credentials": {
+        "slackApi": {
+          "id": "WS2EnAghw3bXuNlB",
+          "name": "Slack account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "#ts",
+          "mode": "name"
+        },
+        "text": "={{ $('RSS Feed Trigger').item.json.link }}",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        656,
+        224
+      ],
+      "id": "c42d8e1f-b926-41e5-a10d-d233ed7bdf46",
+      "name": "Send a message2",
+      "webhookId": "0ec8e317-c86a-411b-8f6b-a8196dcdbfa9",
+      "credentials": {
+        "slackApi": {
+          "id": "WS2EnAghw3bXuNlB",
+          "name": "Slack account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## RSS feed classifier\n- feed https://zenn.dev/feed",
+        "height": 624,
+        "width": 1024
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -32,
+        -224
+      ],
+      "id": "2c161540-3b3d-4691-9a89-7b8fcc2b369e",
+      "name": "Sticky Note"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "RSS Feed Trigger": {
+      "main": [
+        [
+          {
+            "node": "Text Classifier",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Text Classifier",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Text Classifier": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a message2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "8229cff3-e0cb-4614-b196-f916ed72bb1c",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "747c48163b3755ac2f7439e6b96dd8ca2ddac4d09198d1423b696b37d0c84131"
+  },
+  "id": "kDWbnKV4sPwcFsIc",
+  "tags": [
+    {
+      "name": "slack",
+      "id": "kqtTIDYfnvAfz7cJ",
+      "updatedAt": "2025-11-12T03:55:40.283Z",
+      "createdAt": "2025-11-12T03:55:40.283Z"
+    },
+    {
+      "name": "gemini",
+      "id": "PWFn6fh5mw3BviDj",
+      "updatedAt": "2025-11-14T06:08:12.741Z",
+      "createdAt": "2025-11-14T06:08:12.741Z"
+    }
+  ]
+}
