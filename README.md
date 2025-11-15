@@ -229,4 +229,4 @@ Enhanced the RSS Feed Classifier with detailed Slack notifications and improved 
 
 ### Workflow JSON
 
-See [RSS_Feed_Classifier_v2.json](./day9/AINewsletter.json) for the updated workflow configuration.
+See [AINewsletter.json](./day9/AINewsletter.json) for the updated workflow configuration.
