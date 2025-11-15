@@ -206,3 +206,27 @@ Created an automated workflow that classifies RSS feed items and routes them to 
 ### Workflow JSON
 
 See [RSS feed classifier.json](./day8/RSS%20feed%20classifier.json) for the workflow configuration.
+
+## Day 9 RSS Feed Classifier with Slack Notifications
+
+Enhanced the RSS Feed Classifier with detailed Slack notifications and improved content handling.
+
+### New Features
+
+- Added rich Slack message formatting with article previews
+- Implemented error handling for failed API calls
+- Added article summarization for better previews
+- Included article tags in Slack notifications
+- Added timestamp of when the article was published
+
+### Workflow
+
+![day9-workflow](./day9/workflow.png)
+
+### Slack Notification Example
+
+![day9-slack](./day9/slack.png)
+
+### Workflow JSON
+
+See [RSS_Feed_Classifier_v2.json](./day9/AINewsletter.json) for the updated workflow configuration.

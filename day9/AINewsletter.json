@@ -1,0 +1,185 @@
+{
+  "name": "AI Newsletter",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 12
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -560,
+        0
+      ],
+      "id": "11d0d6b6-ae4c-45d9-b3bb-515a8a6d4cde",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "query": "Please gather trending AI news and specific AI utilization methods from Medium, blogs, and YouTube.\n\nPlease only search for content that meets the following criteria:\n- Content introducing specific utilization methods (use cases).\n- Newly released AI tools.\n- Newly released AI models.\n- Updates to existing AI tools.\n- Information regarding AI-generated art (AI art).",
+        "options": {
+          "search_depth": "advanced",
+          "max_results": 20,
+          "time_range": "day",
+          "include_raw_content": true
+        }
+      },
+      "type": "@tavily/n8n-nodes-tavily.tavily",
+      "typeVersion": 1,
+      "position": [
+        -288,
+        0
+      ],
+      "id": "d0d354d9-5f0d-4aeb-9d87-a88b4f0f8883",
+      "name": "Search",
+      "credentials": {
+        "tavilyApi": {
+          "id": "ZZNfcc9rDOrmpijB",
+          "name": "Tavily account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Please create an AI newsletter based on today's retrieved AI news, including a concise summary that encourages readers to check the original article.\n\nBe sure to include the original URL and title.\n\n# Today's AI News\n{{ $json.results.map((article) => `{ title:\n\"${article.title}\",\\n \nurl:\"${article.url}\",\\n\\n \ncontent:\"${article.content.replace(/\\\\n/g,\n'\\\\n')}\" }`).join(\"\\n\") }}\n\n# Format\nPlease use the following format.\nPaste the URL as plain text, not as a Markdown link.\n\n```\n## Title\n[URL]\n\n[Summary of the article]\n```\n\n\n\n",
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        -112,
+        0
+      ],
+      "id": "c384a2b9-116d-4f0c-8035-7a736f1f0d64",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -240,
+        192
+      ],
+      "id": "d3c1d059-91ea-473d-8f87-d9e3bea6d910",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "2JsLbjy4MbUoXgxk",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "#ai",
+          "mode": "name"
+        },
+        "text": "=AI News {{ $now.format('yyyy-MM-dd') }}\n\n{{ $json.text }}",
+        "otherOptions": {
+          "includeLinkToWorkflow": false
+        }
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        240,
+        0
+      ],
+      "id": "d87b8fde-f594-4e7a-86c1-e5ab048886ef",
+      "name": "Send a message",
+      "webhookId": "c5c00fad-a3b0-4026-9d32-a5e252633213",
+      "credentials": {
+        "slackApi": {
+          "id": "WS2EnAghw3bXuNlB",
+          "name": "Slack account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## AI Newsletter\n**Tavily** researches AI news and sends the formatted info to a slack channel\ntavily.com",
+        "height": 544,
+        "width": 1136
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -624,
+        -176
+      ],
+      "id": "0b11bfc3-6a18-48c4-86da-9e7ac57b95ac",
+      "name": "Sticky Note"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Search",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "98b02fc2-1421-4939-a967-d1167adaf26a",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "747c48163b3755ac2f7439e6b96dd8ca2ddac4d09198d1423b696b37d0c84131"
+  },
+  "id": "0zcy3zn5ZinN3H6K",
+  "tags": []
+}
