@@ -1,232 +1,42 @@
 # n8n 30 Days
 
-## Day 1 environment setup
+Hands-on automation practice with [n8n](https://n8n.io/). Each `dayX` folder holds workflows, screenshots, and write-ups.
 
-install Docker Desktop or Orb Stack
+### Day 1
 
-```shell
-openssl rand -hex 32
-```
+[Environment Setup](./day1/README.md) — Spin up n8n locally with Docker and finish the onboarding wizard.
 
-```shell
-docker compose up -d
-```
+### Day 2
 
-### setup n8n account
+[Simple Gmail Check](./day2/README.md) — Poll Gmail, summarize new messages, and see the run results.
 
-http://localhost:5678/setup
+### Day 3
 
-![day1-setup](./images/day1.png)
+[GitHub → Slack Notification](./day3/README.md) — Watch a repo for new issues and alert Slack via webhook (ngrok-ready).
 
-## Day 2 Simple Gmail Check
+### Day 4
 
-Created a basic workflow to check Gmail messages.
+[Weather Report to Slack](./day4/README.md) — Daily Open-Meteo fetch plus formatted Slack update for Brooklyn weather.
 
-### Workflow
+### Day 5
 
-![day2-workflow](./day2/workflow.png)
+[AI Agent Weather Bot](./day5/README.md) — Gemini-powered chat agent that understands prompts and replies with live weather.
 
-### Result
+### Day 6
 
-![day2-result](./day2/result.png)
+[n8n on Hugging Face + Supabase](./day6/README.md) — Deploy n8n as a Docker Space backed by Supabase Postgres.
 
-### Workflow JSON
+### Day 7
 
-See [SimpleGmailCheck.json](./day2/SimpleGmailCheck.json) for the workflow configuration.
+[Pokémon API Assistant](./day7/README.md) — Conversational Gemini flow that queries PokeAPI and shares flavor text/details.
 
-## Day 3 GitHub to Slack Notification
+### Day 8
 
-Created a workflow that sends a Slack notification when a new GitHub issue is created.
+[RSS Feed Classifier](./day8/README.md) — Monitor Zenn.dev RSS, classify topics with Gemini, and route to Slack channels.
 
-requirements for localhost
+### Day 9
 
-- ngrok (for webhook) the following video is useful
-  https://www.youtube.com/watch?v=Sa6c67czyMw
+[RSS Classifier w/ Slack Enhancements](./day9/README.md) — Adds summaries, tags, and robust error handling to Day 8’s flow.
 
-### Workflow Setup
+---
 
-![day3-workflow](./day3/n8n-workflow.png)
-
-### Slack Notification Result
-
-![day3-result](./day3/slack.png)
-
-### Workflow JSON
-
-See [Simple GitHub Notification.json](./day3/Simple%20GitHub%20Notification.json) for the workflow configuration.
-
-## Day 4 Weather Report to Slack
-
-Created a scheduled workflow that fetches weather data from Open-Meteo API and sends daily weather reports to Slack.
-
-### Features
-
-- Scheduled trigger (runs daily at 9 AM)
-- Fetches weather data for Brooklyn from Open-Meteo API
-- JavaScript code to parse and format temperature data
-- Sends formatted weather report to Slack channel
-
-### Workflow
-
-![day4-workflow](./day4/workflow.png)
-
-### Slack Notification
-
-![day4-slack](./day4/slack.png)
-
-### Workflow JSON
-
-See [Simple Weather Report.json](./day4/Simple%20Weather%20Report.json) for the workflow configuration.
-
-## Day 5 AI Agent Weather Bot
-
-Created an AI agent workflow using Google Gemini that processes chat messages, fetches weather data, and sends formatted responses to Slack.
-
-### Features
-
-- Chat trigger to receive user messages
-- Google Gemini AI agent to understand user requests
-- HTTP Request tool to fetch weather data from Open-Meteo API
-- Secondary AI agent to format output for human readability
-- Simple memory buffer for conversation context
-- Automatic Slack notification with formatted weather information
-
-### Workflow
-
-![day5-workflow](./day5/workflow.png)
-
-### Slack Notification
-
-![day5-slack](./day5/slack.png)
-
-### Workflow JSON
-
-See [Simple AI Agent workflow.json](./day5/Simple%20AI%20Agent%20workflow.json) for the workflow configuration.
-
-## Day 6 n8n on Hugging Face Spaces with Supabase
-
-Deployed n8n to Hugging Face Spaces with Supabase as the database backend for persistent storage.
-
-### Features
-
-- Containerized n8n using Docker
-- Persistent storage with Supabase PostgreSQL
-- Basic authentication for security
-- Automatic execution pruning
-- Timezone configuration
-- Chromium support for browser-based automations
-
-### Setup
-
-1. Clone the repository and navigate to day6 directory
-2. Create a Supabase project and note database credentials
-3. Create a Hugging Face Space with Docker
-4. Configure environment variables in Hugging Face Secrets
-5. Deploy using Git or Hugging Face Web UI
-
-### Environment Variables
-
-- `N8N_BASIC_AUTH_USER` - Username for basic auth
-- `N8N_BASIC_AUTH_PASSWORD` - Password for basic auth
-- `N8N_ENCRYPTION_KEY` - 32-character encryption key
-- `WEBHOOK_URL` - Your Hugging Face Space URL
-- Database credentials (host, user, password)
-
-### Access
-
-Once deployed, access your n8n instance at:
-
-```
-https://huggingface.co/spaces/<your-username>/<your-space>
-```
-
-### Files
-
-- [Dockerfile](./day6/Dockerfile) - Container configuration
-- [SETUP.md](./day6/SETUP.md) - Detailed setup instructions
-
-## Day 7 Pokémon API Integration with Google Gemini
-
-Created an AI-powered Pokémon information assistant that fetches data from PokeAPI and responds to natural language queries.
-
-### Features
-
-- Chat interface for natural language queries about Pokémon
-- Google Gemini integration for understanding user requests
-- Automatic Japanese to English translation for Pokémon names
-- Fetches detailed Pokémon information from PokeAPI
-- Formatted responses with key Pokémon details
-- Conversation memory for context-aware interactions
-
-### Workflow
-
-![day7-workflow](./day7/workflow.png)
-
-### Example Interaction
-
-1. User asks about a Pokémon (e.g., "Tell me about Pikachu" or "ピカチュウについて教えて")
-2. The AI processes the request and fetches data from PokeAPI
-3. System responds with:
-   - Pokédex number
-   - English name and color
-   - Legendary/Mythical status
-   - Flavor text in Japanese or English
-
-https://github.com/user-attachments/assets/8e32505e-96f4-4dd9-968f-5c8e2bfe4996
-
-### Requirements
-
-- Google Gemini API key
-- Access to PokeAPI (https://pokeapi.co/)
-
-### Workflow JSON
-
-See [Pokemon_API_Workflow.json](./day7/Pokemon_API_Workflow.json) for the workflow configuration.
-
-## Day 8 RSS Feed Classifier
-
-Created an automated workflow that classifies RSS feed items and routes them to appropriate Slack channels based on content.
-
-### Features
-
-- Monitors Zenn.dev RSS feed for new articles
-- Uses Google Gemini to classify articles into categories (AI, React, TypeScript)
-- Routes articles to dedicated Slack channels based on classification
-- Runs automatically on a schedule (every minute)
-- Supports Japanese content from Zenn.dev
-
-### Workflow
-
-![day8-workflow](./day8/workflow.png)
-
-### Slack Notification
-
-![day8-slack](./day8/slack.png)
-
-### Workflow JSON
-
-See [RSS feed classifier.json](./day8/RSS%20feed%20classifier.json) for the workflow configuration.
-
-## Day 9 RSS Feed Classifier with Slack Notifications
-
-Enhanced the RSS Feed Classifier with detailed Slack notifications and improved content handling.
-
-### New Features
-
-- Added rich Slack message formatting with article previews
-- Implemented error handling for failed API calls
-- Added article summarization for better previews
-- Included article tags in Slack notifications
-- Added timestamp of when the article was published
-
-### Workflow
-
-![day9-workflow](./day9/workflow.png)
-
-### Slack Notification Example
-
-![day9-slack](./day9/slack.png)
-
-### Workflow JSON
-
-See [AINewsletter.json](./day9/AINewsletter.json) for the updated workflow configuration.
