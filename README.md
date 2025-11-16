@@ -40,4 +40,3 @@ Hands-on automation practice with [n8n](https://n8n.io/). Each `dayX` folder hol
 
 ---
 
-**Suggestion:** we could add a progress table or timeline (with status badges and tech tags) at the top so newcomers can quickly find workflows by trigger/API—let me know if you'd like that overview added.
