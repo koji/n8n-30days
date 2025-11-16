@@ -29,9 +29,9 @@ ENV N8N_USER_FOLDER=/data
 
 # --- Timezone Settings ---
 # Set system timezone (Modify as needed)
-ENV TZ=Asia/Taipei
+ENV TZ=America/New_York
 # Set n8n-specific timezone (Modify as needed)
-ENV GENERIC_TIMEZONE=Asia/Taipei
+ENV GENERIC_TIMEZONE=America/New_York
 # Apply the system timezone
 RUN cp /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
