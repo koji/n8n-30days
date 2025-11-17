@@ -38,5 +38,8 @@ Hands-on automation practice with [n8n](https://n8n.io/). Each `dayX` folder hol
 
 [RSS Classifier w/ Slack Enhancements](./day9/README.md) — Adds summaries, tags, and robust error handling to Day 8’s flow.
 
----
+### Day 10
 
+[AI Image Generation](./day10/README.md) — Generate AI-powered images on a schedule and upload to Google Drive.
+
+---
