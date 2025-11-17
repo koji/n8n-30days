@@ -34,13 +34,11 @@ This workflow generates images using Google's Gemini 2.5 Flash (Nano Banana) mod
 
 ![Day 10 Workflow](./workflow.png)
 
-1. **Schedule Trigger**: Checks for new text files in the specified interval
-2. **Google Drive Node**: Scans the input folder for new prompt files
-3. **Filter Node**: Identifies unprocessed text files
-4. **Google Drive Node**: Downloads the prompt file content
-5. **Gemini 2.5 Flash Node**: Generates image based on the prompt
-6. **Google Drive Node**: Saves the generated image to the output folder
-7. **Slack Node**: (Optional) Sends a notification when image is generated
+1. **Schedule Trigger**: Initiates the workflow at the specified interval
+2. **AI Agent Node**: Generates a text prompt for image creation
+3. **Gemini 2.5 Flash Node**: Generates an image based on the AI-generated prompt
+4. **Google Drive Node**: Saves the generated image to the output folder
+5. **Slack Node**: (Optional) Sends a notification when an image is generated
 
 ## Example Output
 
