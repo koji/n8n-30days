@@ -40,6 +40,6 @@ Hands-on automation practice with [n8n](https://n8n.io/). Each `dayX` folder hol
 
 ### Day 10
 
-[Automated Document Processing](./day10/README.md) — Monitor Google Drive for new documents, process with AI, and store in Google Drive.
+[AI Image Generation](./day10/README.md) — Generate AI-powered images on a schedule and upload to Google Drive.
 
 ---
