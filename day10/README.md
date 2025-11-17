@@ -4,7 +4,7 @@ This workflow generates images using Google's Gemini 2.5 Flash (Nano Banana) mod
 
 ## Features
 
-- Monitors a Google Drive folder for new text prompts
+- Periodically processes text prompt files from a Google Drive folder using a schedule trigger
 - Uses Gemini 2.5 Flash (Nano Banana) for high-quality image generation
 - Supports custom image generation parameters
 - Automatically saves generated images to Google Drive
