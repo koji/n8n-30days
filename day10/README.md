@@ -27,9 +27,9 @@ This workflow generates images using Google's Gemini 2.5 Flash (Nano Banana) mod
 2. Configure environment variables:
    - `GOOGLE_APPLICATION_CREDENTIALS`: Path to your service account key file
    - `GEMINI_API_KEY`: Your Google Gemini API key
-   - `GOOGLE_DRIVE_OUTPUT_FOLDER_ID`: ID of the folder to store generated images
    - `SLACK_WEBHOOK_URL`: (Optional) For receiving notifications
 
+**Note:** The Google Drive output folder ID is hardcoded in the workflow JSON file. You must manually edit the workflow JSON and set the folder ID in the Google Drive node configuration to specify where generated images are saved.
 ## Workflow Overview
 
 ![Day 10 Workflow](./workflow.png)
