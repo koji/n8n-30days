@@ -1,4 +1,4 @@
-# Day 10 - Automated Document Processing with Google Drive and AI
+# Day 10 - AI Image Generation with Gemini 2.5 Flash (Nano Banana) and Google Drive
 
 This workflow generates images using Google's Gemini 2.5 Flash (Nano Banana) model by processing text prompts from Google Drive and saving the generated images back to a specified folder.
 
