@@ -1,0 +1,460 @@
+{
+  "name": "Nano Banana",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        80,
+        80
+      ],
+      "id": "b7c20bb4-b445-4f5b-acb4-e15e9775d5a0",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://openrouter.ai/api/v1/chat/completions",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openRouterApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"google/gemini-2.5-flash-image\",\n  \"modalities\": [\"image\", \"text\"],\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": {{($json[\"prompt\"]).toJsonString()}}\n    }\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        768,
+        320
+      ],
+      "id": "5897f915-e658-485e-8801-b7dd1ebc41aa",
+      "name": "HTTP Request",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "a9B1no67QANVCclY",
+          "name": "Header Auth account"
+        },
+        "googlePalmApi": {
+          "id": "sI1uSHnUXRKiapnt",
+          "name": "Google Gemini(PaLM) Api account"
+        },
+        "openRouterApi": {
+          "id": "NAGt2GySGCrRoFJQ",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "base",
+        "binaryPropertyName": "={{ $json.data }}",
+        "options": {
+          "mimeType": "={{ $json.mime }}"
+        }
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        1152,
+        320
+      ],
+      "id": "18a50977-ecef-4368-8ae9-d4f9d1ee0da1",
+      "name": "Convert to File",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "女の子のポーズを一つだけ出力してください。  \n複数ではなく、一つの具体的なポーズと服装指定をシンプルに英語で表現してください。  \n\n## キャラクター設定\n- 年齢：22歳\n- 性格：明るい・ポジティブ・少し天然\n- 好きなこと：美容、ファッション、日常、恋愛、ライフスタイル、トレンド\n\n## 季節\n- 夏。露出多めで。\n\n## ポーズの目的\n- 目的：フォロワーの共感を集め、いいね・リプライ・リポストを増やす\n\n## NG例\n- 全身は移さないように、おなかより上にすること\n",
+        "options": {
+          "systemMessage": "あなたはAI美女インフルエンサーの構成作家です。 "
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        240,
+        320
+      ],
+      "id": "3b988cc4-4955-424d-9e30-5908d6c46292",
+      "name": "AI Agent1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "fd4d2665-7547-4f3e-b5a5-a3dba80bf294",
+              "name": "prompt",
+              "value": "={{ $json.output }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        544,
+        320
+      ],
+      "id": "6291601f-74e1-46ca-9751-c2d69856c66a",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ebdc2837-65d1-40b1-81f5-36edb8c1d692",
+              "name": "data",
+              "value": "={{ $json.choices[0].message.images[0].image_url.url }}",
+              "type": "string"
+            },
+            {
+              "id": "61935e61-00c4-44e0-b50b-c119fcd63a44",
+              "name": "base",
+              "value": "={{ $json.choices[0].message.images[0].image_url.url.split(\",\")[1]}}",
+              "type": "string"
+            },
+            {
+              "id": "bbedd8fb-bf08-4e6c-8e96-f46ee3f9c1ae",
+              "name": "mime",
+              "value": "={{ $json.choices[0].message.images[0].image_url.url.match(/^data:([^;]+)/)[1]}}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {
+          "stripBinary": true
+        }
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        960,
+        320
+      ],
+      "id": "6625b2ae-d03a-4ef0-8f9e-6d4607336eb8",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 2
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        80,
+        320
+      ],
+      "id": "5ccf287b-4209-42a7-b0ba-d471956ffa0b",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "content": "## prompt creator",
+        "height": 240,
+        "width": 688,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        256
+      ],
+      "typeVersion": 1,
+      "id": "02c829af-acf1-4cb1-a17e-ed8fec86c2d4",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## debug",
+        "height": 240,
+        "width": 256,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        0
+      ],
+      "typeVersion": 1,
+      "id": "ccdf3183-6cce-45d9-8445-651218d169a2",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "### nano-banana(Gemini 2.5 Flash Image) on openrouter",
+        "height": 240,
+        "width": 800
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        704,
+        256
+      ],
+      "typeVersion": 1,
+      "id": "0dcee7e2-16ac-4e66-a0fe-b707dc4d536a",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "## upload",
+        "height": 240,
+        "width": 256,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1536,
+        256
+      ],
+      "typeVersion": 1,
+      "id": "5428208a-1402-4c12-93ea-e6a3ca337531",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        80,
+        592
+      ],
+      "id": "2763c888-1965-4178-91ad-b77911f90825",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "sI1uSHnUXRKiapnt",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## LLM",
+        "height": 240,
+        "width": 256,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        528
+      ],
+      "typeVersion": 1,
+      "id": "c43bdf14-331b-44b2-b4f9-014abb0e4504",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "inputDataFieldName": "=data",
+        "name": "={{$now.format('yyyy-MM-dd')}}.png",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "https://drive.google.com/drive/folders/1seti_K2RkI78A2HQ2eePMHrNdjbmkSFQ",
+          "mode": "url"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1584,
+        320
+      ],
+      "id": "a84b206d-81ce-4d5f-9ad6-572936ae8af4",
+      "name": "Upload file1",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "YfmHQcgTGu2icLfw",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a0a5f269-0236-44df-8665-545acecdd727",
+              "name": "data",
+              "value": "={{ $('Edit Fields').item.json.data }}",
+              "type": "binary"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1360,
+        320
+      ],
+      "id": "5df5c415-e78a-4fe9-ae1f-48a92fbef852",
+      "name": "Edit Fields2"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "Upload file1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "bb0afef2-09c6-4c6c-9741-a4e2f48f2a4b",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "00799714ad881a60002585c19fa00ecdb4da62fd4a60592765610218030fdae3"
+  },
+  "id": "JaBHcIHmpRmnG8MG",
+  "tags": [
+    {
+      "updatedAt": "2025-11-14T06:08:12.741Z",
+      "createdAt": "2025-11-14T06:08:12.741Z",
+      "id": "PWFn6fh5mw3BviDj",
+      "name": "gemini"
+    },
+    {
+      "updatedAt": "2025-11-16T07:55:23.518Z",
+      "createdAt": "2025-11-16T07:55:23.518Z",
+      "id": "3wCgBMcy13ikUK1o",
+      "name": "nanobanana"
+    },
+    {
+      "updatedAt": "2025-11-16T07:55:28.573Z",
+      "createdAt": "2025-11-16T07:55:28.573Z",
+      "id": "In0quMqnqZoSZzyL",
+      "name": "googledrive"
+    }
+  ]
+}
