@@ -1,0 +1,119 @@
+{
+  "name": "Simple Chat with llama3.3-70B",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -368,
+        -176
+      ],
+      "id": "2418a77b-c32c-4f27-a04d-76b445ead0fe",
+      "name": "When chat message received",
+      "webhookId": "3f1b1482-4c18-4eba-8c98-342150a1842d"
+    },
+    {
+      "parameters": {
+        "model": "meta-llama/llama-3.3-70b-instruct:free",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        -176,
+        16
+      ],
+      "id": "4427a75f-e6cd-49a0-ae7e-8cd5bb86aa16",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "NAGt2GySGCrRoFJQ",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        -160,
+        -176
+      ],
+      "id": "38d3e1ba-7b46-451c-aa27-cd994d3f17ad",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -48,
+        128
+      ],
+      "id": "6b270dc4-a8b8-4290-b584-052a202699d3",
+      "name": "Simple Memory"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "1a59b1cf-1565-41e5-8b15-7bd263a25f1b",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "00799714ad881a60002585c19fa00ecdb4da62fd4a60592765610218030fdae3"
+  },
+  "id": "kf66KJAPMxAOPSXH",
+  "tags": [
+    {
+      "updatedAt": "2025-11-18T18:09:08.058Z",
+      "createdAt": "2025-11-18T18:09:08.058Z",
+      "id": "Pu6E9RtvGPB5ErY9",
+      "name": "rag"
+    }
+  ]
+}

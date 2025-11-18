@@ -42,4 +42,8 @@ Hands-on automation practice with [n8n](https://n8n.io/). Each `dayX` folder hol
 
 [AI Image Generation](./day10/README.md) — Generate AI-powered images on a schedule and upload to Google Drive.
 
+### Day 11
+
+[Llama3.3-70B via OpenRouter](./day11/README.md) — Integrate with the powerful Llama3.3-70B model through OpenRouter API for natural language processing tasks.
+
 ---
