@@ -1,0 +1,78 @@
+{
+  "name": "My workflow 3",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "65475e53-6765-4617-b8c6-ba8521d70fa8",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "authentication": "webhook",
+        "content": "hello",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "6a747696-3065-4996-8520-539f3b5dc8c9",
+      "name": "Discord",
+      "webhookId": "dd3a8cc5-4807-4359-a119-2ce1662d6c40",
+      "credentials": {
+        "discordWebhookApi": {
+          "id": "IqXKA3aFT0UB8i1r",
+          "name": "Discord Webhook account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Discord (send a message) with webhook",
+        "height": 352,
+        "width": 608
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -144,
+        -128
+      ],
+      "id": "419efab9-667d-4602-9e57-57af14e0716e",
+      "name": "Sticky Note"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Discord",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "31c0677b-5d75-4e84-a1c4-255e83e66fca",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "9c9c50ea1bc65581caf989a4c98224dfab50af6d8a810104b6e1b498daaf0cbb"
+  },
+  "id": "HU34IGfJnvi36vyE",
+  "tags": []
+}
