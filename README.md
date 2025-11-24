@@ -50,4 +50,8 @@ Hands-on automation practice with [n8n](https://n8n.io/). Each `dayX` folder hol
 
 [Discord Webhook Integration](./day12/README.md) — Send messages to a Discord channel using webhooks. Includes Docker configuration for Hugging Face Spaces compatibility.
 
+### Day 13
+
+[RSS Feed to Haiku Generator](./day13/README.md) — Automate reading an RSS feed, generating a haiku with Gemini, and posting to X (Twitter).
+
 ---
