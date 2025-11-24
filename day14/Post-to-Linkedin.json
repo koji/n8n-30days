@@ -1,0 +1,439 @@
+{
+  "name": "Post-to-Linkedin",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Post to LinkedIn",
+        "formDescription": "the form for Posting to LinkedIn",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Email",
+              "fieldType": "email",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Topic",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Target audience",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {
+          "buttonLabel": "Submit"
+        }
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.3,
+      "position": [
+        -224,
+        -160
+      ],
+      "id": "20a51b4c-4125-464d-8a77-21748d79e7e9",
+      "name": "On form submission",
+      "webhookId": "10dc368e-b4ce-478a-9c0a-995bfc71b0d6"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Post Topic: {{ $json.Topic }}\nTarget Audience: {{ $json['Target audience'] }}",
+        "options": {
+          "systemMessage": "You are an AI agent specialized in creating professional, educational, and engaging LinkedIn posts based on a given topic.\n\n■ Objective Use the Tavily tool to conduct real-time searches and gather reliable, accurate information related to the topic. The post must be beneficial to the specified target audience.\nBased on the collected information, generate a LinkedIn post that meets the following criteria:\n\n■ Post Structure (Format)\nAttention-grabbing introduction (hook) — e.g., “According to the latest research…”\nMain content (educational and valuable to the reader) — e.g., “Using this strategy, ROI doubled.”\nCall to action (CTA) — e.g., “Share your experience in the comments.”\n\n■ Tone of the Post\nProfessional yet approachable\nEducational and value-driven\nEngaging to the reader\n\n■ Post Length\nWithin 300 words\n\n■ Additional Output Requirements\nProvide only the LinkedIn-ready text in the output\nInclude information gathered via Tavily and links to cited sources (URLs)\nInclude three relevant hashtags related to the post content\n\n■ Workflow Example\nReceive the topic — e.g., “ROI in the automotive industry”\nConduct a real-time search using Tavily to gather trustworthy information\nCreate a professional and educational LinkedIn post following the structure\nSelect three relevant hashtags and include a call to action to complete the post\n\n🔍 [Hook] According to recent research, [insert surprising or insightful fact related to the topic].\n\n📘 [Educational Value] [Explain the key insight or strategy clearly and concisely. For example:] By applying [insert strategy or method], companies in [industry] have seen a [insert measurable outcome, e.g., 2x increase in ROI]. This approach is gaining traction because it [insert reason or benefit].\n\n💬 [CTA] Have you tried something similar in your work? Share your experience in the comments—I’d love to learn from you!\n\n#Hashtags \n#InnovationIn[Industry] #StrategyInsights #ProfessionalGrowth\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        -16,
+        -160
+      ],
+      "id": "10588aef-55f9-471c-9f6e-3711db364a8a",
+      "name": "LinkedIn Post Generator"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -144,
+        48
+      ],
+      "id": "cdd95f14-6692-461a-81b7-249ef2bd6e70",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "sI1uSHnUXRKiapnt",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toolDescription": "Use this tool for realtime-search",
+        "method": "POST",
+        "url": "https://api.tavily.com/search",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer YOUR_API_KEY"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"query\": \"{{ $fromAI('searchTerm', 'web search term', 'string')}}\",\n  \"auto_parameters\": false,\n  \"topic\": \"general\",\n  \"search_depth\": \"basic\",\n  \"chunks_per_source\": 3,\n  \"max_results\": 1,\n  \"time_range\": null,\n  \"days\": 7,\n  \"include_answer\": true,\n  \"include_raw_content\": false,\n  \"include_images\": false,\n  \"include_image_descriptions\": false,\n  \"include_favicon\": false,\n  \"include_domains\": [],\n  \"exclude_domains\": [],\n  \"country\": null\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.3,
+      "position": [
+        128,
+        64
+      ],
+      "id": "d8707fea-800b-4fdf-8f5a-38edb97d59c1",
+      "name": "HTTP Request Tavily"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=LinkedIn Post:\n{{ $json.output }}",
+        "options": {
+          "systemMessage": "You are an AI agent specialized in creating visual content for #graphic marketing materials based on LinkedIn posts. Your target users are readers of LinkedIn posts, and your goal is to convey messages in a visually appealing, easy-to-understand, and brand-aligned manner.\n\n■ Purpose\nRead and analyze the given LinkedIn post\nCreate a design that visually communicates the content of the post\nDesign in accordance with brand guidelines\nSelect the optimal output format based on the post’s objective, and generate appropriate prompts for graphic creation if needed\n\n■ Output Content\nSummarize, organize, and visualize the visual ideas of the post\nSelect and generate the optimal output format based on the post’s objective\nProduce a design suitable for a LinkedIn post that aligns with brand guidelines\nProvide an explanation of the design and how it supports the post’s objective\n\n■ Output Format\nBrand Guidelines\nBrand themes and design concepts\nBrand colors, fonts, motifs, modern aesthetic, line-style illustrations, line-style icons, line-style diagrams, etc.\nOutput Format\nGraphics for LinkedIn posts (e.g., a header image with a title and visually clear illustrations or diagrams)\nSelect the optimal format based on the post’s objective\nExplanation of Output\nDescribe the output and explain how it supports the post’s objective\n\nOutput Prompt\nBased on the output content, convert human-written descriptions into prompts that can be understood by image generation AIs to create graphic content (e.g., generate a prompt to create a cleanly designed diagram based on the above content and hints)"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        336,
+        -160
+      ],
+      "id": "cbbaf728-03bd-4e23-9ea0-eae89d1bba85",
+      "name": "Image Generator Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        352,
+        48
+      ],
+      "id": "ad886b0d-ede3-46f0-aab2-803fb0422adf",
+      "name": "Google Gemini Chat Model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "sI1uSHnUXRKiapnt",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ebdc2837-65d1-40b1-81f5-36edb8c1d692",
+              "name": "data",
+              "value": "={{ $json.choices[0].message.images[0].image_url.url }}",
+              "type": "string"
+            },
+            {
+              "id": "61935e61-00c4-44e0-b50b-c119fcd63a44",
+              "name": "base",
+              "value": "={{ $json.choices[0].message.images[0].image_url.url.split(\",\")[1]}}",
+              "type": "string"
+            },
+            {
+              "id": "bbedd8fb-bf08-4e6c-8e96-f46ee3f9c1ae",
+              "name": "mime",
+              "value": "={{ $json.choices[0].message.images[0].image_url.url.match(/^data:([^;]+)/)[1]}}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {
+          "stripBinary": true
+        }
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        752,
+        -160
+      ],
+      "id": "261b384d-a21e-4c89-bd75-a699b73a32a9",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "base",
+        "binaryPropertyName": "={{ $json.data }}",
+        "options": {
+          "fileName": "generated_image.png",
+          "mimeType": "={{ $json.mime }}"
+        }
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        896,
+        -160
+      ],
+      "id": "4007cde3-0495-4ae8-b7b4-d1355df9a49a",
+      "name": "Convert to File",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://openrouter.ai/api/v1/chat/completions",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openRouterApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"google/gemini-2.5-flash-image\",\n  \"modalities\": [\"image\", \"text\"],\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": {{($json[\"output\"]).toJsonString()}}\n    }\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        608,
+        -160
+      ],
+      "id": "e2d48a27-a41b-4818-b4d9-af75336cf31d",
+      "name": "HTTP Request1",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "a9B1no67QANVCclY",
+          "name": "Header Auth account"
+        },
+        "googlePalmApi": {
+          "id": "sI1uSHnUXRKiapnt",
+          "name": "Google Gemini(PaLM) Api account"
+        },
+        "openRouterApi": {
+          "id": "oSRDBQdbzUCm01n4",
+          "name": "OpenRouter account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "person": "Cj9yBUJg9u",
+        "text": "={{ $('LinkedIn Post Generator').item.json.output }}",
+        "shareMediaCategory": "IMAGE",
+        "additionalFields": {
+          "visibility": "PUBLIC"
+        }
+      },
+      "type": "n8n-nodes-base.linkedIn",
+      "typeVersion": 1,
+      "position": [
+        1200,
+        -160
+      ],
+      "id": "a0a63cda-41ec-4e17-8a62-352a20e1699d",
+      "name": "Create a post",
+      "credentials": {
+        "linkedInOAuth2Api": {
+          "id": "THHUgRPAoNKzrxrn",
+          "name": "LinkedIn account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a0a5f269-0236-44df-8665-545acecdd727",
+              "name": "data",
+              "value": "={{ $('Edit Fields').item.json.data }}",
+              "type": "binary"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1024,
+        -160
+      ],
+      "id": "7b444472-c3cf-44c0-9cdf-fac8991ba6b8",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {
+        "content": "## Create a post for LinkedIn\n- submit a topic\n- search a topic with Tavily and generate a post\n- generate a prompt from the generated post with Nano Banana\n- merge the generated text and image and post it to LinkedIn",
+        "height": 560,
+        "width": 1744
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -320,
+        -320
+      ],
+      "id": "39e860a3-4d34-40b0-839a-04eab9c64151",
+      "name": "Sticky Note"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "LinkedIn Post Generator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "LinkedIn Post Generator",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request Tavily": {
+      "ai_tool": [
+        [
+          {
+            "node": "LinkedIn Post Generator",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "LinkedIn Post Generator": {
+      "main": [
+        [
+          {
+            "node": "Image Generator Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Image Generator Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Image Generator Agent": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "Create a post",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a post": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "e9dfdc54-7e57-49b7-9abf-893c748a9b9d",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "9c9c50ea1bc65581caf989a4c98224dfab50af6d8a810104b6e1b498daaf0cbb"
+  },
+  "id": "WCku0esACSGI342v",
+  "tags": [
+    {
+      "updatedAt": "2025-11-24T06:23:45.426Z",
+      "createdAt": "2025-11-24T06:23:45.426Z",
+      "id": "J1G4gzwxLaysSfbQ",
+      "name": "linkedin"
+    }
+  ]
+}
