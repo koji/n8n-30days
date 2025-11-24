@@ -54,4 +54,8 @@ Hands-on automation practice with [n8n](https://n8n.io/). Each `dayX` folder hol
 
 [RSS Feed to Haiku Generator](./day13/README.md) — Automate reading an RSS feed, generating a haiku with Gemini, and posting to X (Twitter).
 
+### Day 14
+
+[Automated LinkedIn Post Generator](./day14/README.md) — Create and post LinkedIn content using Gemini, Tavily, and Nano Banana.
+
 ---
