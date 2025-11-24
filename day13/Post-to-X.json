@@ -1,0 +1,187 @@
+{
+  "name": "Post-to-X",
+  "nodes": [
+    {
+      "parameters": {
+        "text": "={{ $json.haiku }}\n{{ $json.tags }} #haiku\n{{ $json.link }}\n",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.twitter",
+      "typeVersion": 2,
+      "position": [
+        1168,
+        -160
+      ],
+      "id": "72134f0c-dec7-4401-b922-d11d92a89459",
+      "name": "Create Tweet",
+      "credentials": {
+        "twitterOAuth2Api": {
+          "id": "LLqY0qDESMZLTeew",
+          "name": "X account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://news.web.nhk/n-data/conf/na/rss/cat6.xml",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        -128,
+        672
+      ],
+      "id": "7f47cf9b-f741-43be-a0ce-77a52e383db5",
+      "name": "RSS Read5"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=下記の記事のタイトルとコンテントからニュースに関する俳句を生成してください。同時にhashtagを3つ生成してください。\n\n{{ $json.title }}\n{{ $json.content }}\n\n出力結果は以下のフォーマットを利用する事\n\n[生成された俳句]\n{{ $json.link }} \n#生成されたtag1 \n#生成されたtag2 \n#生成されたtag3",
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        608,
+        -160
+      ],
+      "id": "ac15433e-b157-4002-b0ee-fbdf6f773611",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        480,
+        48
+      ],
+      "id": "17a810b8-7b7f-436a-8771-baebad445327",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "sI1uSHnUXRKiapnt",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "custom",
+              "cronExpression": "0 */2 * * *"
+            }
+          ]
+        },
+        "feedUrl": "https://news.web.nhk/n-data/conf/na/rss/cat0.xml"
+      },
+      "type": "n8n-nodes-base.rssFeedReadTrigger",
+      "typeVersion": 1,
+      "position": [
+        400,
+        -208
+      ],
+      "id": "2ccb1d52-5759-4e0f-8647-4359886a8dbc",
+      "name": "RSS Feed Trigger"
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $input.first().json.text.split('\\n')\nconsole.log(data)\nconst haiku = `${data[0]}  ${data[1]}  ${data[2]}`\nconst tags= `${data[4]} ${data[5]} ${data[6]}`\nconst link = data[3]\nreturn {\n  'haiku':haiku,\n  'tags': tags,\n  'link': link\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        960,
+        -160
+      ],
+      "id": "f607e73e-0317-40b9-9919-33df4ea73ad0",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "content": "## Tweet from RSS feed\n** get feed and generate a haiku from the feed content and post it to X",
+        "height": 544,
+        "width": 1072
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        352,
+        -336
+      ],
+      "id": "fd754aeb-8734-4340-825f-2db268b4102c",
+      "name": "Sticky Note"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RSS Feed Trigger": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Create Tweet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "8df8026c-b34c-43ea-8402-864f065bc597",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "9c9c50ea1bc65581caf989a4c98224dfab50af6d8a810104b6e1b498daaf0cbb"
+  },
+  "id": "d7WeIq3N2LrZLiaN",
+  "tags": [
+    {
+      "updatedAt": "2025-11-23T06:18:04.328Z",
+      "createdAt": "2025-11-23T06:18:04.328Z",
+      "id": "DkSxPsN2NUGq8Ws5",
+      "name": "x"
+    }
+  ]
+}
