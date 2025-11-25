@@ -115,7 +115,7 @@
     },
     {
       "parameters": {
-        "content": "## Even on luma.com\n- fetch the website\n- parse the scraped html data\n- format the message for Discord\n- send a formatted message to event channel",
+        "content": "## Event on luma.com\n- fetch the website\n- parse the scraped html data\n- format the message for Discord\n- send a formatted message to event channel",
         "height": 528,
         "width": 1456
       },
