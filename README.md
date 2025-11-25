@@ -58,4 +58,8 @@ Hands-on automation practice with [n8n](https://n8n.io/). Each `dayX` folder hol
 
 [Automated LinkedIn Post Generator](./day14/README.md) — Create and post LinkedIn content using Gemini, Tavily, and Nano Banana.
 
+### Day 15
+
+[Event Notification Workflow](./day15/README.md) — Scrape Luma event data and send notifications to Discord with rate limiting.
+
 ---
