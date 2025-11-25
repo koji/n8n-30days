@@ -1,0 +1,247 @@
+{
+  "name": "Event Notification Workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "url": "https://luma.com/nyc",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "User-Agent",
+              "value": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+            },
+            {
+              "name": "Accept",
+              "value": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8"
+            },
+            {
+              "name": "Accept-Language",
+              "value": "en-US,en;q=0.5"
+            }
+          ]
+        },
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -64,
+        48
+      ],
+      "id": "b59e7296-7853-4cd1-bd9e-282a3471098b",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "jsCode": "function formatToEST(isoString) {\n  // Safety check: return a placeholder if the string is empty or undefined\n  if (!isoString) return 'Date not available';\n\n  const date = new Date(isoString);\n\n  return date.toLocaleString(\"en-US\", {\n    timeZone: \"America/New_York\",\n    year: 'numeric',\n    month: '2-digit',\n    day: '2-digit',\n    hour: 'numeric',\n    minute: '2-digit',\n    timeZoneName: 'short'\n  });\n}\n\nfunction extractEvents(htmlString) {\n  try {\n    // 1. Locate the Next.js hydration script\n    const startMarker = '<script id=\"__NEXT_DATA__\" type=\"application/json\">';\n    const endMarker = '</script>';\n\n    const startIndex = htmlString.indexOf(startMarker);\n    if (startIndex === -1) {\n      throw new Error('Could not find __NEXT_DATA__ script tag.');\n    }\n\n    // 2. Extract the JSON string contents\n    const contentStart = startIndex + startMarker.length;\n    const contentEnd = htmlString.indexOf(endMarker, contentStart);\n    const jsonString = htmlString.substring(contentStart, contentEnd);\n\n    // 3. Parse the JSON\n    const parsedData = JSON.parse(jsonString);\n\n    // 4. Navigate the JSON path to find events\n    // Path: props -> pageProps -> initialData -> data -> events\n    const rawEventsArray = parsedData?.props?.pageProps?.initialData?.data?.events || [];\n\n    // 5. Filter & Map\n    const cleanEvents = rawEventsArray\n      // [Change] Only keep valid events that have a URL (link)\n      // This corresponds to elements with class=\"event-link\" on the page\n      .filter((item) => item.event && item.event.url)\n      .map((item) => {\n        const evtInfo = item.event; // The main event details\n        const hosts = item.hosts || [];\n      \n        return {\n          name: evtInfo.name,\n          url: `https://lu.ma/${evtInfo.url}`,\n          startTime: formatToEST(evtInfo.start_at),\n          endTime: formatToEST(evtInfo.end_at),\n          location: evtInfo.geo_address_info?.full_address || evtInfo.geo_address_info?.city_state || 'Location Hidden/Virtual',\n          hostName: hosts.length > 0 ? hosts[0].name : 'Unknown',\n          // coverImage: evtInfo.cover_url,\n          // guestCount: item.guest_count,\n          status: item.ticket_info?.is_sold_out ? 'Sold Out' : 'Open'\n        };\n      });\n\n    return cleanEvents;\n\n  } catch (error) {\n    return { error: error.message };\n  }\n}\n\n// n8n Input handling\n// Assumes that $input.first().json.data is an HTML string\nconst htmlString = $input.first().json.data;\nconst results = extractEvents(htmlString);\n\nreturn { 'data': results };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        144,
+        48
+      ],
+      "id": "d7aeba86-8bdc-4a92-b7f6-eb8051ab87ac",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "data",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        352,
+        48
+      ],
+      "id": "4182047b-87cc-4750-93f5-2db673b01d4b",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "authentication": "webhook",
+        "content": "=event info\n{{ $json.name }} - {{ $json.status }}\n{{ $json.startTime }} - {{ $json.endTime }}\nlocation: {{ $json.location }}\n{{ $json.url }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        784,
+        80
+      ],
+      "id": "7d93f36c-cc20-4b3e-8dab-424687772d83",
+      "name": "Discord",
+      "webhookId": "ce64a785-bab7-46e2-ace7-02f6b69ac381",
+      "credentials": {
+        "discordWebhookApi": {
+          "id": "xSvrZ3jkT42lRsBb",
+          "name": "Discord Webhook account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "batchSize": "=1",
+        "options": {
+          "reset": false
+        }
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        576,
+        64
+      ],
+      "id": "1c9a2374-1136-48ee-9125-fc089fe1465d",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        944,
+        80
+      ],
+      "id": "4864b64a-8e3c-472d-980c-595e51e39dc0",
+      "name": "Wait",
+      "webhookId": "a85b66f1-fa11-4e5c-8477-166579501f76"
+    },
+    {
+      "parameters": {
+        "content": "## Event on luma.com\n- fetch the website\n- parse the scraped html data\n- format the message for Discord\n- send a formatted message to event channel",
+        "height": 528,
+        "width": 1456
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -288,
+        -144
+      ],
+      "id": "3da970e1-86a9-423e-9915-57123602895a",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "triggerAtDay": [
+                1
+              ],
+              "triggerAtHour": 7
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -240,
+        48
+      ],
+      "id": "2ea56e80-c4e2-4bce-8fe3-2148b379991d",
+      "name": "Schedule Trigger"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Discord",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Discord": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "82315738-0c90-4462-ba1f-79d65ed10eb5",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "9c9c50ea1bc65581caf989a4c98224dfab50af6d8a810104b6e1b498daaf0cbb"
+  },
+  "id": "8tjOEUR73rNlFqd1",
+  "tags": []
+}
