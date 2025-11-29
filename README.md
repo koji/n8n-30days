@@ -62,4 +62,8 @@ Hands-on automation practice with [n8n](https://n8n.io/). Each `dayX` folder hol
 
 [Event Notification Workflow](./day15/README.md) — Scrape Luma event data and send notifications to Discord with rate limiting.
 
+### Day 16
+
+[Generate Article from Chat](./day16/README.md) — Convert chat messages into formatted articles using AI models and save to Google Drive.
+
 ---

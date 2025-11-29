@@ -1,0 +1,428 @@
+{
+  "name": "Write Blog Workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -432,
+        0
+      ],
+      "id": "d94929d3-b48a-4c76-bb10-822f52e7a497",
+      "name": "When chat message received",
+      "webhookId": "af767313-1fd5-4fa0-a168-e08b155b4e70"
+    },
+    {
+      "parameters": {
+        "url": "https://google-search74.p.rapidapi.com/",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "query",
+              "value": "={{ $json.chatInput }}"
+            },
+            {
+              "name": "limit",
+              "value": "3"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-RapidAPI-Host",
+              "value": "google-search74.p.rapidapi.com"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -272,
+        0
+      ],
+      "id": "97d0cde6-f8c1-480e-8bc6-ee8fb0252ab6",
+      "name": "HTTP Request",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "VQUxhLA8kMR3nlLi",
+          "name": "Header Auth account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get the 'results' array from the HTTP Request Node output\n\nconst results = $json.results;\n//const results = $input.first().json.data\n\n// Extract the URLs from each result\nconst extractedUrls = results.map(result => ({\n    url: result.url,\n    title: result.title,\n    // Optional: Include title if needed for context\n    description: result.description,\n    // Optional: Include description if needed\n}));\n\n// Return structured output\nreturn extractedUrls;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -128,
+        0
+      ],
+      "id": "f825da8c-d036-4277-a794-1950de32b861",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        64,
+        0
+      ],
+      "id": "61199057-9e5e-4d8b-89b3-6cf312f6a7df",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.url }}",
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        288,
+        16
+      ],
+      "id": "6008c1d4-a2ba-48c3-9ad8-6690e518f01b",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        288,
+        -416
+      ],
+      "id": "e7dc8eb2-10ee-427f-ab91-dbae72450287",
+      "name": "Loop Over Items1"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get the input HTML from json.data\n// const html = $input.first().json.data || \"\";\nconst html = $json.data || \"\";\n\nif (!html) {\n    throw new Error(\"No HTML content provided in json.data. Ensure the input contains valid HTML.\");\n}\n\n// Function to extract and clean content from specified tags\nfunction extractAndCleanContent(html, tag) {\n    const regex = new RegExp(`<${tag}[^>]*>(.*?)<\\/${tag}>`, \"gis\");\n    const matches = [...html.matchAll(regex)];\n\n    // Remove nested HTML tags and return plain text\n    return matches.map(match => match[1].replace(/<[^>]*>/g, \"\").trim());\n\n}\n\n// Extract and clean body text (from <p> and <span> tags)\nconst bodyText = [\n    ...extractAndCleanContent(html, \"p\"),\n    ...extractAndCleanContent(html, \"span\")\n];\n\n// Return the clean text as an array\n\nreturn {\n    bodyText\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        528,
+        -256
+      ],
+      "id": "62339ac9-37d1-4ec9-a3b2-3f9298907d59",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Ensure we process multiple items from the input\nconst results = items.map(item => item.json.bodyText); // Collect 'bodyText' from each iteration\n// Define a separator to distinguish pages\nconst separator = \"\\n\\n--- Page Break ---\\n\\n\";\n// Combine all body text into a single string\nconst combinedBodyText = results.join(separator);\n// Return the concatenated result\nreturn {\n    combinedBodyText\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        496,
+        -432
+      ],
+      "id": "a18d0fe4-05ef-48f5-9b37-6778b8db8bb8",
+      "name": "Code in JavaScript2"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=役割：精密なデータ抽出・要約専門家\n\n指示：3つのウェブページからスクレイピングされた本文テキストを分析し、その中に含まれる重要な情報を構造化した詳細な要約を作成してください。高品質なブログ記事の作成に役立つ、独自性があり関連性の高い実用的なインサイトの特定に焦点を当ててください。\n\n手順\n\n1. 入力分析：提供された3つのウェブページの統合本文テキストを検証する：{{ $json.combinedBodyText }}\n\n2. トピック識別：統合テキストで議論されている包括的なテーマやトピックを特定する\n\n3. コンテンツ抽出：以下のような重要な詳細を抽出する：\n\n・主要なポイントや論点\n\n・裏付けとなる事実、統計、証拠\n\n・独自のインサイトや視点\n\n\n\n\n\n4. 整理された要約：ブログライターが使いやすい形式で情報を構造化する。\n\n以下のセクションを使用：\n\n・ はじめに/概要\n\n・主要なインサイト/発見事項（リスト形式）\n\n・裏付けとなる証拠/事例\n\n・含意や潜在的な応用\n\n\n\n\n\n5. 明確性と関連性\n\n・要約は簡潔で、不必要な繰り返しを避け、ブログ記事作成に直接関連するものにする\n\n・最終目標：入力テキストからすべての重要な情報を含む、一貫性があり詳細な要約を生成すること。この要約は、その後のブログ記事作成ステップの基盤となるコンテンツとして機能します。\n\n・重点事項：読者に深みと価値を提供するコンテンツの抽出を重視してください。例：独自のデータポイント、専門家の意見、実用的な応用例など。一般的な情報の重複は避け、代わりに統合されたウェブページに固有の具体的な内容を強調してください。\n\n・出力例の構造\n\n\n\n概要：[3つのウェブページで扱われている全体的なトピックの簡潔な説明]\n\n主要なインサイト/発見事項\n\n[インサイト1]\n\n[インサイト2]\n\n[インサイト3]\n\n裏付けとなる証拠/事例\n\n\n\n[ページ1からの事実や事例]\n\n[ページ2からの事実や事例]\n\n[ページ3からの事実や事例]\n\n\n\n含意や応用\n\n[情報がどのように応用できるか、またはその広範囲な含意の分析]\n\n注意: 出力は必ず日本語で作成してください。 "
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        656,
+        -432
+      ],
+      "id": "f8077b70-c52b-404e-82fb-48945a3542ea",
+      "name": "Message a model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "sI1uSHnUXRKiapnt",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=役割\n\n「あなたは高品質で検索エンジン最適化された記事の作成に長けた、経験豊富なSEOコンテンツライターです。競合コンテンツを分析し、既存の上位結果を上回る優れたバージョンを作成することに専門性を持っています。」\n\n\n\n指示\n「指定されたトピックについて、検索結果上位から抽出された重要なコンテンツを含む要約：{{ $json.content.parts[0].text }}を受け取ります。この事実情報は、検索エンジン結果で既に優秀なパフォーマンスを示している内容を表しています。あなたの任務は、このコンテンツを受け取り、分析し、魅力的で有益であるだけでなく、価値、深度、ユーザーエクスペリエンスの面でこれらの競合他社を上回るブログ記事を作成することです。」\n\n\n\n手順\n\n1. コンテンツ分析：\n\n・上位ランキングページからの最良の情報を含む要約を徹底的にレビューする\n\n・既存コンテンツが深度、明確性、価値の面で改善できる領域を特定する\n\n・あなたが対処できる競合コンテンツのギャップや見落とされたポイントに注目する\n\n\n\n2. 記事の構造化：\n\n・明確な導入部、魅力的な本文、強力な結論を持つ、よく構造化された形式でコンテンツを整理する\n\n・各セクションが読みやすさのために最適化され、論理的な流れと適切なヘッダー（H1、H2、H3）の使用で簡単にナビゲートできるようにする\n\n・複雑な情報を消化しやすいチャンクに分解し、短い段落、箇条書き、番号付きリストを適切に使用する\n\n\n\n3. 読みやすさの向上：\n\n・プロフェッショナリズムと権威性を維持しながら、会話的で理解しやすいトーンで書く\n\n\n\n4. 独自の価値の追加：\n\n・現在の上位ランキングコンテンツで提供されているものを超えて、読者に独自の価値を加える実用的なインサイト、実例、またはヒントを提供する\n\n・あなたのポイントを支持し、あなたの記事を競合他社からさらに差別化するために、データ、ケーススタディ、または専門家の引用を含める\n\n・該当する場合、理解と関与を高めるためにマルチメディア（画像、グラフ、チャート）を追加する\n\n\n\n5. 最終レビュー：\n\n・文法について記事を二重チェックする\n\n\n\n■最終目標\n\n「あなたの究極の目標は、現在の上位競合他社を上回るだけでなく、より多くの価値を提供し、読者を惹きつけ、理解しやすい、優れたSEO最適化ブログ記事を作成することです。コンテンツは権威的で、よく研究されており、訪問者を忠実な読者や顧客に変換するように設計されている必要があります。」\n\n\n\n■重点事項\n\n「上位ランキングページからの事実情報に厳密に焦点を当て、それを改善し拡張してください。トピック外または無関係なコンテンツを含めることは避けてください。ターゲットオーディエンスの検索意図に合わせ続けてください。これは、トピックに関する実用的で深度があり信頼できる情報を見つけることです。キーワードを過度に詰め込まないでください。文章が自然に流れ、読者中心であることを確保してください。」\n\n\n\n■ 重要な注意事項:\n\n・出力は必ず日本語で作成してください\n\n・日本語圏の読者に適した表現と文体を使用してください\n\n・日本の文化や慣習に配慮した内容にしてください"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        928,
+        -432
+      ],
+      "id": "c1426dba-b9a4-4a39-9c03-9a7d3f761375",
+      "name": "Message a model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "sI1uSHnUXRKiapnt",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "createFromText",
+        "content": "={{ $json.content.parts[0].text }}",
+        "name": "=blogPost_{{ $now }}",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "https://drive.google.com/drive/folders/1seti_K2RkI78A2HQ2eePMHrNdjbmkSFQ",
+          "mode": "url"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1232,
+        -432
+      ],
+      "id": "772ee13a-b41f-4c35-a155-52516e9c7cf7",
+      "name": "Create file from text",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "YfmHQcgTGu2icLfw",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Generate an article from Chat\n",
+        "height": 896,
+        "width": 2176
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -512,
+        -576
+      ],
+      "id": "9e4c7bbc-2120-485d-a60e-dcbd40d56abd",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Format the output",
+        "height": 480,
+        "width": 1360,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        128,
+        -512
+      ],
+      "id": "ac5128f5-b46f-4a1a-877a-6ea3b99a3664",
+      "name": "Sticky Note1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript2": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Message a model1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model1": {
+      "main": [
+        [
+          {
+            "node": "Create file from text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "9ac0087d-e214-40e3-983e-8723b9443d84",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "9c9c50ea1bc65581caf989a4c98224dfab50af6d8a810104b6e1b498daaf0cbb"
+  },
+  "id": "pA0ZdK2zp6rBy6pj",
+  "tags": [
+    {
+      "name": "blog",
+      "id": "o4a0vCL161I9VjzZ",
+      "updatedAt": "2025-11-28T19:06:50.218Z",
+      "createdAt": "2025-11-28T19:06:50.218Z"
+    },
+    {
+      "updatedAt": "2025-11-14T06:08:12.741Z",
+      "createdAt": "2025-11-14T06:08:12.741Z",
+      "id": "PWFn6fh5mw3BviDj",
+      "name": "gemini"
+    },
+    {
+      "updatedAt": "2025-11-16T07:55:28.573Z",
+      "createdAt": "2025-11-16T07:55:28.573Z",
+      "id": "In0quMqnqZoSZzyL",
+      "name": "googledrive"
+    }
+  ]
+}
