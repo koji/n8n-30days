@@ -19,7 +19,7 @@ This workflow listens for chat messages, processes them through AI models to gen
 
 ### Article Generation (Subflow)
 
-5. **Loop Over Items** — Processes each item for article generation
+5. **Loop Over Items1** — Processes each item for article generation
 6. **Code in JavaScript2** — Prepares data for AI processing
 7. **Message a model** — First AI model call for content generation
 8. **Code in JavaScript1** — Intermediate processing
